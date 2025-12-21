@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercises - The Bloch Sphere</title>
+    <link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Concept 9: Exercises</h1>
+            <p class="subtitle">Practice Problems for the Bloch Sphere</p>
+        </header>
+
+        <nav class="nav-buttons">
+            <a href="../08-mixed-states/index.html" class="btn btn-secondary">Previous</a>
+            <a href="../index.html" class="btn btn-primary">Home</a>
+            <a href="../10-summary/index.html" class="btn btn-secondary">Next</a>
+        </nav>
+
+        <div class="content-grid">
+            <div class="section full-width exercise-section">
+                <h2>Exercise 1: Bloch Vector Calculation</h2>
+                <div class="exercise-problem">
+                    <p><strong>Problem:</strong> Derive the Bloch vector (x, y, z) for the state:</p>
+                    <div class="formula">|ψ⟩ = cos(π/6)|0⟩ + e<sup>iπ/4</sup>sin(π/6)|1⟩</div>
+                </div>
+                <button class="solution-toggle" onclick="toggleSolution('sol1')">Show Solution</button>
+                <div id="sol1" class="solution" style="display: none;">
+                    <p><strong>Solution:</strong></p>
+                    <p>From the general form |ψ⟩ = cos(θ/2)|0⟩ + e<sup>iφ</sup>sin(θ/2)|1⟩:</p>
+                    <ul style="margin-left: 20px;">
+                        <li>θ/2 = π/6, so θ = π/3</li>
+                        <li>φ = π/4</li>
+                    </ul>
+                    <p>The Bloch vector coordinates are:</p>
+                    <div class="formula">
+                        x = sin(θ)cos(φ) = sin(π/3)cos(π/4) = (√3/2)(√2/2) = √6/4 ≈ 0.612<br>
+                        y = sin(θ)sin(φ) = sin(π/3)sin(π/4) = (√3/2)(√2/2) = √6/4 ≈ 0.612<br>
+                        z = cos(θ) = cos(π/3) = 1/2 = 0.5
+                    </div>
+                    <p><strong>Answer:</strong> r⃗ = (√6/4, √6/4, 1/2) ≈ (0.612, 0.612, 0.5)</p>
+                </div>
+            </div>
+
+            <div class="section full-width exercise-section">
+                <h2>Exercise 2: Gate Rotation</h2>
+                <div class="exercise-problem">
+                    <p><strong>Problem:</strong> Show that R<sub>z</sub>(π/2) rotates the state |+⟩ to |+i⟩.</p>
+                </div>
+                <button class="solution-toggle" onclick="toggleSolution('sol2')">Show Solution</button>
+                <div id="sol2" class="solution" style="display: none;">
+                    <p><strong>Solution:</strong></p>
+                    <p>The R<sub>z</sub>(π/2) gate is:</p>
+                    <div class="formula">R<sub>z</sub>(π/2) = [e<sup>-iπ/4</sup> 0; 0 e<sup>iπ/4</sup>]</div>
+                    <p>Applying to |+⟩ = (|0⟩ + |1⟩)/√2:</p>
+                    <div class="formula">
+                        R<sub>z</sub>(π/2)|+⟩ = (e<sup>-iπ/4</sup>|0⟩ + e<sup>iπ/4</sup>|1⟩)/√2
+                    </div>
+                    <p>Factor out the global phase e<sup>-iπ/4</sup>:</p>
+                    <div class="formula">
+                        = e<sup>-iπ/4</sup>(|0⟩ + e<sup>iπ/2</sup>|1⟩)/√2 = e<sup>-iπ/4</sup>(|0⟩ + i|1⟩)/√2
+                    </div>
+                    <p>Since global phase doesn't matter: this is |+i⟩!</p>
+                    <p><strong>Geometrically:</strong> |+⟩ is at (+X axis), rotating 90° about Z gives (+Y axis) = |+i⟩</p>
+                </div>
+            </div>
+
+            <div class="section full-width exercise-section">
+                <h2>Exercise 3: Density Matrix</h2>
+                <div class="exercise-problem">
+                    <p><strong>Problem:</strong> Compute the density matrix of |-⟩ = (|0⟩ - |1⟩)/√2 and find its Bloch vector.</p>
+                </div>
+                <button class="solution-toggle" onclick="toggleSolution('sol3')">Show Solution</button>
+                <div id="sol3" class="solution" style="display: none;">
+                    <p><strong>Solution:</strong></p>
+                    <p>The state vector is:</p>
+                    <div class="formula">|-⟩ = [1/√2, -1/√2]<sup>T</sup></div>
+                    <p>The density matrix ρ = |−⟩⟨−|:</p>
+                    <div class="formula">
+                        ρ = [1/√2; -1/√2] × [1/√2, -1/√2]<br>
+                        = [1/2, -1/2; -1/2, 1/2]
+                    </div>
+                    <p>Extract Bloch vector using ρ = ½(I + r⃗·σ⃗):</p>
+                    <div class="formula">
+                        x = 2·Re(ρ₀₁) = 2·(-1/2) = -1<br>
+                        y = 2·Im(ρ₀₁) = 0<br>
+                        z = ρ₀₀ - ρ₁₁ = 1/2 - 1/2 = 0
+                    </div>
+                    <p><strong>Answer:</strong> r⃗ = (-1, 0, 0), which is the -X axis as expected!</p>
+                </div>
+            </div>
+
+            <div class="section full-width exercise-section">
+                <h2>Exercise 4: Sequential Gates</h2>
+                <div class="exercise-problem">
+                    <p><strong>Problem:</strong> Visualize how the Hadamard and Z gates act sequentially on |0⟩ on the Bloch sphere.</p>
+                </div>
+                <button class="solution-toggle" onclick="toggleSolution('sol4')">Show Solution</button>
+                <div id="sol4" class="solution" style="display: none;">
+                    <p><strong>Solution:</strong></p>
+                    <p><strong>Step 1:</strong> Start at |0⟩ = (0, 0, 1) — North pole</p>
+                    <p><strong>Step 2:</strong> Apply H (180° rotation about (X+Z)/√2 axis):</p>
+                    <div class="formula">H|0⟩ = |+⟩ = (1, 0, 0) — +X axis</div>
+                    <p><strong>Step 3:</strong> Apply Z (180° rotation about Z axis):</p>
+                    <div class="formula">Z|+⟩ = |-⟩ = (-1, 0, 0) — -X axis</div>
+                    <p><strong>Path on Bloch sphere:</strong></p>
+                    <p>North pole → +X axis → -X axis</p>
+                    <p>The Z gate flips the sign of the |1⟩ component, which on the equator means moving to the opposite side.</p>
+                </div>
+            </div>
+
+            <div class="section full-width exercise-section">
+                <h2>Exercise 5: Global Phase</h2>
+                <div class="exercise-problem">
+                    <p><strong>Problem:</strong> Explain why a global phase factor e<sup>iγ</sup> does not change the position on the Bloch sphere.</p>
+                </div>
+                <button class="solution-toggle" onclick="toggleSolution('sol5')">Show Solution</button>
+                <div id="sol5" class="solution" style="display: none;">
+                    <p><strong>Solution:</strong></p>
+                    <p>Consider a state |ψ⟩ and its globally-phased version e<sup>iγ</sup>|ψ⟩.</p>
+                    <p>The density matrix for e<sup>iγ</sup>|ψ⟩ is:</p>
+                    <div class="formula">
+                        ρ' = (e<sup>iγ</sup>|ψ⟩)(e<sup>-iγ</sup>⟨ψ|) = e<sup>iγ</sup>e<sup>-iγ</sup>|ψ⟩⟨ψ| = |ψ⟩⟨ψ| = ρ
+                    </div>
+                    <p>Since the density matrix is unchanged, and the Bloch vector is derived from the density matrix:</p>
+                    <div class="formula">
+                        x = Tr(ρσ<sub>x</sub>), y = Tr(ρσ<sub>y</sub>), z = Tr(ρσ<sub>z</sub>)
+                    </div>
+                    <p>The Bloch vector (x, y, z) remains the same!</p>
+                    <p><strong>Physical interpretation:</strong> Global phase has no observable consequences — all measurement probabilities and expectation values are identical.</p>
+                </div>
+            </div>
+
+            <div class="section full-width exercise-section">
+                <h2>Exercise 6: Measurement Probability</h2>
+                <div class="exercise-problem">
+                    <p><strong>Problem:</strong> A qubit is in state |ψ⟩ with Bloch vector (0.6, 0, 0.8). What is the probability of measuring |0⟩?</p>
+                </div>
+                <button class="solution-toggle" onclick="toggleSolution('sol6')">Show Solution</button>
+                <div id="sol6" class="solution" style="display: none;">
+                    <p><strong>Solution:</strong></p>
+                    <p>For Z-basis measurement, the probability of |0⟩ depends on the z-coordinate:</p>
+                    <div class="formula">P(|0⟩) = (1 + z)/2 = (1 + 0.8)/2 = 0.9 = 90%</div>
+                    <p>Alternatively, from z = cos(θ):</p>
+                    <div class="formula">
+                        θ = arccos(0.8) ≈ 0.6435 rad<br>
+                        P(|0⟩) = cos²(θ/2) = cos²(0.3218) ≈ 0.9 = 90%
+                    </div>
+                    <p><strong>Answer:</strong> 90% probability of measuring |0⟩</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-buttons">
+            <a href="../08-mixed-states/index.html" class="btn btn-secondary">Previous</a>
+            <a href="../index.html" class="btn btn-primary">Home</a>
+            <a href="../10-summary/index.html" class="btn btn-secondary">Next</a>
+        </nav>
+    </div>
+
+    <script>
+        function toggleSolution(id) {
+            const sol = document.getElementById(id);
+            const btn = sol.previousElementSibling;
+            if (sol.style.display === 'none') {
+                sol.style.display = 'block';
+                btn.textContent = 'Hide Solution';
+            } else {
+                sol.style.display = 'none';
+                btn.textContent = 'Show Solution';
+            }
+        }
+    </script>
+</body>
+</html>

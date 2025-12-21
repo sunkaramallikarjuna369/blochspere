@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathematical Representation - The Bloch Sphere</title>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Concept 2: Mathematical Representation</h1>
+            <p class="subtitle">The θ and φ Parameterization</p>
+        </header>
+
+        <nav class="nav-buttons">
+            <a href="../01-introduction/index.html" class="btn btn-secondary">Previous</a>
+            <a href="../index.html" class="btn btn-primary">Home</a>
+            <a href="../03-common-states/index.html" class="btn btn-secondary">Next</a>
+        </nav>
+
+        <div class="section full-width">
+            <h2>Interactive: Explore θ and φ</h2>
+            <div id="canvas-container"></div>
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label>θ (Theta): <span id="theta-value">π/2</span></label>
+                    <input type="range" id="theta-slider" min="0" max="314" value="157" step="1">
+                </div>
+                <div class="control-group">
+                    <label>φ (Phi): <span id="phi-value">0</span></label>
+                    <input type="range" id="phi-slider" min="0" max="628" value="0" step="1">
+                </div>
+            </div>
+            <div class="info-box" style="margin-top: 15px;">
+                <h4>Current State</h4>
+                <p id="state-display">|ψ⟩ = cos(π/4)|0⟩ + e<sup>i·0</sup>sin(π/4)|1⟩</p>
+                <p id="coords-display">Bloch vector: (x, y, z) = (1.00, 0.00, 0.00)</p>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="section">
+                <h2>The General Qubit State</h2>
+                <p>Any single-qubit pure state can be written as:</p>
+                <div class="formula">|ψ⟩ = cos(θ/2)|0⟩ + e<sup>iφ</sup>sin(θ/2)|1⟩</div>
+                <p>where:</p>
+                <ul style="margin-left: 20px;">
+                    <li><strong>θ ∈ [0, π]</strong> is the polar (colatitude) angle</li>
+                    <li><strong>φ ∈ [0, 2π)</strong> is the azimuthal angle</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>The Bloch Vector</h2>
+                <p>These angles define a point on a unit sphere using spherical coordinates:</p>
+                <div class="formula">
+                    x = sin(θ)cos(φ)<br>
+                    y = sin(θ)sin(φ)<br>
+                    z = cos(θ)
+                </div>
+                <p>The Bloch vector is:</p>
+                <div class="formula">r⃗ = (x, y, z)</div>
+                <p>For pure states: |r⃗| = 1</p>
+            </div>
+
+            <div class="section full-width">
+                <h2>Understanding the Angles</h2>
+                <div class="axis-info">
+                    <div class="axis-item z-axis">
+                        <div class="axis-name">θ (Theta)</div>
+                        <p>Controls the "latitude" on the sphere</p>
+                        <p>θ = 0 → North pole (|0⟩)</p>
+                        <p>θ = π → South pole (|1⟩)</p>
+                        <p>θ = π/2 → Equator</p>
+                    </div>
+                    <div class="axis-item x-axis">
+                        <div class="axis-name">φ (Phi)</div>
+                        <p>Controls the "longitude" on the sphere</p>
+                        <p>φ = 0 → +X direction (|+⟩)</p>
+                        <p>φ = π → -X direction (|-⟩)</p>
+                        <p>φ = π/2 → +Y direction (|+i⟩)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Why θ/2?</h2>
+                <p>Notice we use <strong>θ/2</strong> in the state formula, not θ. This is because:</p>
+                <ul style="margin-left: 20px;">
+                    <li>Quantum states related by a global phase are physically identical</li>
+                    <li>Opposite points on the Bloch sphere are <strong>orthogonal</strong> states</li>
+                    <li>A 180° rotation on the sphere corresponds to going from |0⟩ to |1⟩</li>
+                </ul>
+                <div class="key-point">
+                    <h4>Key Insight</h4>
+                    <p>The factor of 2 ensures that antipodal points on the sphere represent orthogonal quantum states.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Amplitude vs Phase</h2>
+                <p>The two angles capture different aspects of the qubit:</p>
+                <table>
+                    <tr>
+                        <th>Angle</th>
+                        <th>Controls</th>
+                        <th>Physical Meaning</th>
+                    </tr>
+                    <tr>
+                        <td>θ</td>
+                        <td>Relative amplitude</td>
+                        <td>Probability of measuring |0⟩ vs |1⟩</td>
+                    </tr>
+                    <tr>
+                        <td>φ</td>
+                        <td>Relative phase</td>
+                        <td>Interference pattern in superposition</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="section full-width">
+                <h2>Python Example</h2>
+                <div class="code-block">
+<pre>import numpy as np
+
+def bloch_to_state(theta, phi):
+    """Convert Bloch sphere angles to state vector."""
+    alpha = np.cos(theta / 2)
+    beta = np.exp(1j * phi) * np.sin(theta / 2)
+    return np.array([alpha, beta])
+
+def state_to_bloch(state):
+    """Convert state vector to Bloch coordinates."""
+    alpha, beta = state[0], state[1]
+    
+    # Calculate theta from |alpha|
+    theta = 2 * np.arccos(np.abs(alpha))
+    
+    # Calculate phi from the phase of beta relative to alpha
+    if np.abs(beta) > 1e-10:
+        phi = np.angle(beta) - np.angle(alpha)
+    else:
+        phi = 0
+    
+    # Convert to Cartesian
+    x = np.sin(theta) * np.cos(phi)
+    y = np.sin(theta) * np.sin(phi)
+    z = np.cos(theta)
+    
+    return theta, phi, (x, y, z)
+
+# Example: Create |+⟩ state
+theta, phi = np.pi/2, 0
+state = bloch_to_state(theta, phi)
+print(f"|+⟩ state: {state}")
+print(f"Bloch coordinates: {state_to_bloch(state)[2]}")</pre>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-buttons">
+            <a href="../01-introduction/index.html" class="btn btn-secondary">Previous</a>
+            <a href="../index.html" class="btn btn-primary">Home</a>
+            <a href="../03-common-states/index.html" class="btn btn-secondary">Next</a>
+        </nav>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls;
+        let stateVector, statePoint, thetaArc, phiArc;
+        let theta = Math.PI / 2, phi = 0;
+        
+        function init() {
+            const container = document.getElementById('canvas-container');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a2e);
+            
+            camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(2.5, 2, 2.5);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+            
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            
+            createBlochSphere();
+            createAngleIndicators();
+            addLighting();
+            
+            document.getElementById('theta-slider').addEventListener('input', updateFromSliders);
+            document.getElementById('phi-slider').addEventListener('input', updateFromSliders);
+            
+            window.addEventListener('resize', onWindowResize, false);
+            updateDisplay();
+            animate();
+        }
+        
+        function createBlochSphere() {
+            // Wireframe sphere
+            const sphereGeo = new THREE.SphereGeometry(1, 32, 32);
+            const sphereMat = new THREE.MeshBasicMaterial({
+                color: 0x00d4ff,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.15
+            });
+            scene.add(new THREE.Mesh(sphereGeo, sphereMat));
+            
+            // Equator
+            const equatorGeo = new THREE.RingGeometry(0.99, 1.01, 64);
+            const equatorMat = new THREE.MeshBasicMaterial({ color: 0xffd700, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
+            const equator = new THREE.Mesh(equatorGeo, equatorMat);
+            equator.rotation.x = Math.PI / 2;
+            scene.add(equator);
+            
+            // Axes
+            const axisLen = 1.4;
+            addAxis(-axisLen, 0, 0, axisLen, 0, 0, 0xff6b6b, 'X');
+            addAxis(0, -axisLen, 0, 0, axisLen, 0, 0x4ecdc4, 'Y');
+            addAxis(0, 0, -axisLen, 0, 0, axisLen, 0x45b7d1, 'Z');
+            
+            addLabel('|0⟩', 0, 0, 1.5);
+            addLabel('|1⟩', 0, 0, -1.5);
+            
+            // State vector
+            stateVector = new THREE.ArrowHelper(
+                new THREE.Vector3(1, 0, 0),
+                new THREE.Vector3(0, 0, 0),
+                1, 0xff6b9d, 0.15, 0.1
+            );
+            scene.add(stateVector);
+            
+            // State point
+            const pointGeo = new THREE.SphereGeometry(0.08, 16, 16);
+            const pointMat = new THREE.MeshPhongMaterial({ color: 0xff6b9d, emissive: 0xff6b9d, emissiveIntensity: 0.5 });
+            statePoint = new THREE.Mesh(pointGeo, pointMat);
+            scene.add(statePoint);
+        }
+        
+        function createAngleIndicators() {
+            // Theta arc (from Z axis to state)
+            thetaArc = createArc(0.5, 0xff6b6b);
+            scene.add(thetaArc);
+            
+            // Phi arc (on XY plane)
+            phiArc = createArc(0.3, 0x4ecdc4);
+            phiArc.rotation.x = Math.PI / 2;
+            scene.add(phiArc);
+        }
+        
+        function createArc(radius, color) {
+            const curve = new THREE.EllipseCurve(0, 0, radius, radius, 0, Math.PI/2, false, 0);
+            const points = curve.getPoints(32);
+            const geometry = new THREE.BufferGeometry().setFromPoints(points.map(p => new THREE.Vector3(p.x, 0, p.y)));
+            const material = new THREE.LineBasicMaterial({ color: color, linewidth: 2 });
+            return new THREE.Line(geometry, material);
+        }
+        
+        function addAxis(x1, y1, z1, x2, y2, z2, color, label) {
+            const geo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(x1, y1, z1),
+                new THREE.Vector3(x2, y2, z2)
+            ]);
+            const mat = new THREE.LineBasicMaterial({ color: color });
+            scene.add(new THREE.Line(geo, mat));
+        }
+        
+        function addLabel(text, x, y, z) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 36px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(text, 64, 45);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+            const sprite = new THREE.Sprite(material);
+            sprite.position.set(x, y, z);
+            sprite.scale.set(0.5, 0.25, 1);
+            scene.add(sprite);
+        }
+        
+        function updateFromSliders() {
+            theta = parseFloat(document.getElementById('theta-slider').value) / 100;
+            phi = parseFloat(document.getElementById('phi-slider').value) / 100;
+            updateDisplay();
+        }
+        
+        function updateDisplay() {
+            // Update state vector
+            const x = Math.sin(theta) * Math.cos(phi);
+            const y = Math.sin(theta) * Math.sin(phi);
+            const z = Math.cos(theta);
+            
+            stateVector.setDirection(new THREE.Vector3(x, y, z).normalize());
+            statePoint.position.set(x, y, z);
+            
+            // Update theta arc
+            scene.remove(thetaArc);
+            const thetaCurve = new THREE.EllipseCurve(0, 0, 0.5, 0.5, Math.PI/2, Math.PI/2 - theta, true, 0);
+            const thetaPoints = thetaCurve.getPoints(32);
+            const thetaGeo = new THREE.BufferGeometry().setFromPoints(thetaPoints.map(p => new THREE.Vector3(p.x * Math.cos(phi), p.x * Math.sin(phi), p.y)));
+            thetaArc = new THREE.Line(thetaGeo, new THREE.LineBasicMaterial({ color: 0xffd700 }));
+            scene.add(thetaArc);
+            
+            // Update phi arc
+            scene.remove(phiArc);
+            if (phi > 0.01) {
+                const phiCurve = new THREE.EllipseCurve(0, 0, 0.3, 0.3, 0, phi, false, 0);
+                const phiPoints = phiCurve.getPoints(32);
+                const phiGeo = new THREE.BufferGeometry().setFromPoints(phiPoints.map(p => new THREE.Vector3(p.x, p.y, 0)));
+                phiArc = new THREE.Line(phiGeo, new THREE.LineBasicMaterial({ color: 0x4ecdc4 }));
+                scene.add(phiArc);
+            }
+            
+            // Update text displays
+            document.getElementById('theta-value').textContent = formatAngle(theta);
+            document.getElementById('phi-value').textContent = formatAngle(phi);
+            
+            const thetaHalf = theta / 2;
+            document.getElementById('state-display').innerHTML = 
+                `|ψ⟩ = cos(${formatAngle(thetaHalf)})|0⟩ + e<sup>i·${formatAngle(phi)}</sup>sin(${formatAngle(thetaHalf)})|1⟩`;
+            document.getElementById('coords-display').textContent = 
+                `Bloch vector: (x, y, z) = (${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)})`;
+        }
+        
+        function formatAngle(rad) {
+            const piMultiple = rad / Math.PI;
+            if (Math.abs(piMultiple) < 0.01) return '0';
+            if (Math.abs(piMultiple - 0.25) < 0.01) return 'π/4';
+            if (Math.abs(piMultiple - 0.5) < 0.01) return 'π/2';
+            if (Math.abs(piMultiple - 0.75) < 0.01) return '3π/4';
+            if (Math.abs(piMultiple - 1) < 0.01) return 'π';
+            return (piMultiple).toFixed(2) + 'π';
+        }
+        
+        function addLighting() {
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+            const point = new THREE.PointLight(0xffffff, 1);
+            point.position.set(5, 5, 5);
+            scene.add(point);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+        
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

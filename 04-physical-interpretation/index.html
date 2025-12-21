@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physical Interpretation - The Bloch Sphere</title>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Concept 4: Physical Interpretation</h1>
+            <p class="subtitle">Understanding the Geometry of Quantum States</p>
+        </header>
+
+        <nav class="nav-buttons">
+            <a href="../03-common-states/index.html" class="btn btn-secondary">Previous</a>
+            <a href="../index.html" class="btn btn-primary">Home</a>
+            <a href="../05-density-matrix/index.html" class="btn btn-secondary">Next</a>
+        </nav>
+
+        <div class="section full-width">
+            <h2>Interactive: Explore the Physical Meaning</h2>
+            <div id="canvas-container"></div>
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label>Show Region:</label>
+                    <select id="region-select">
+                        <option value="all">All Regions</option>
+                        <option value="poles">Poles (|0⟩ and |1⟩)</option>
+                        <option value="equator">Equator (Superpositions)</option>
+                        <option value="hemisphere">Northern Hemisphere</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>θ: <span id="theta-value">π/2</span></label>
+                    <input type="range" id="theta-slider" min="0" max="314" value="157">
+                </div>
+            </div>
+            <div class="info-box" style="margin-top: 15px;">
+                <p id="prob-display">P(|0⟩) = 50% | P(|1⟩) = 50%</p>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="section">
+                <h2>The Poles</h2>
+                <h3>North Pole: |0⟩</h3>
+                <p>At θ = 0, the state is purely |0⟩. Measuring this state always gives outcome 0.</p>
+                <div class="formula">P(0) = cos²(0/2) = 1</div>
+                
+                <h3>South Pole: |1⟩</h3>
+                <p>At θ = π, the state is purely |1⟩. Measuring this state always gives outcome 1.</p>
+                <div class="formula">P(1) = sin²(π/2) = 1</div>
+                
+                <div class="key-point">
+                    <h4>Antipodal = Orthogonal</h4>
+                    <p>Points on opposite sides of the sphere represent orthogonal quantum states: ⟨0|1⟩ = 0</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>The Equator</h2>
+                <p>At θ = π/2, we have equal superpositions of |0⟩ and |1⟩:</p>
+                <div class="formula">|ψ⟩ = (|0⟩ + e<sup>iφ</sup>|1⟩)/√2</div>
+                <p>All equatorial states have:</p>
+                <ul style="margin-left: 20px;">
+                    <li>P(0) = P(1) = 50%</li>
+                    <li>Different relative phases (φ)</li>
+                    <li>Different interference patterns</li>
+                </ul>
+                <div class="key-point">
+                    <h4>Phase Matters!</h4>
+                    <p>|+⟩ and |-⟩ both give 50-50 outcomes, but they're orthogonal states with different interference behavior.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Latitude = Probability</h2>
+                <p>The "latitude" (determined by θ) directly controls measurement probabilities:</p>
+                <div class="formula">
+                    P(0) = cos²(θ/2)<br>
+                    P(1) = sin²(θ/2)
+                </div>
+                <table>
+                    <tr><th>θ</th><th>P(0)</th><th>P(1)</th></tr>
+                    <tr><td>0</td><td>100%</td><td>0%</td></tr>
+                    <tr><td>π/4</td><td>85%</td><td>15%</td></tr>
+                    <tr><td>π/2</td><td>50%</td><td>50%</td></tr>
+                    <tr><td>3π/4</td><td>15%</td><td>85%</td></tr>
+                    <tr><td>π</td><td>0%</td><td>100%</td></tr>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>Longitude = Phase</h2>
+                <p>The "longitude" (φ) controls the relative phase between |0⟩ and |1⟩:</p>
+                <ul style="margin-left: 20px;">
+                    <li><strong>φ = 0</strong>: Real positive superposition (|+⟩)</li>
+                    <li><strong>φ = π</strong>: Real negative superposition (|-⟩)</li>
+                    <li><strong>φ = π/2</strong>: Imaginary positive (|+i⟩)</li>
+                    <li><strong>φ = 3π/2</strong>: Imaginary negative (|-i⟩)</li>
+                </ul>
+                <div class="key-point">
+                    <h4>Phase is Physical</h4>
+                    <p>While global phase doesn't matter, relative phase affects interference and is measurable!</p>
+                </div>
+            </div>
+
+            <div class="section full-width">
+                <h2>Intuitive Summary</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Concept</th>
+                            <th>Bloch Sphere Interpretation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Relative phase</td>
+                            <td>Rotation around Z-axis (longitude)</td>
+                        </tr>
+                        <tr>
+                            <td>Quantum superposition</td>
+                            <td>Point between poles (latitude)</td>
+                        </tr>
+                        <tr>
+                            <td>Measurement probability</td>
+                            <td>Distance from poles</td>
+                        </tr>
+                        <tr>
+                            <td>Orthogonal states</td>
+                            <td>Antipodal points</td>
+                        </tr>
+                        <tr>
+                            <td>Pure vs mixed state</td>
+                            <td>On surface vs inside sphere</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section full-width">
+                <h2>Python Example</h2>
+                <div class="code-block">
+<pre>import numpy as np
+
+def measurement_probabilities(theta):
+    """Calculate measurement probabilities from theta."""
+    p0 = np.cos(theta / 2) ** 2
+    p1 = np.sin(theta / 2) ** 2
+    return p0, p1
+
+# Explore different latitudes
+print("θ (radians) | θ (degrees) | P(|0⟩) | P(|1⟩)")
+print("-" * 50)
+for theta_deg in [0, 30, 45, 60, 90, 120, 150, 180]:
+    theta = np.radians(theta_deg)
+    p0, p1 = measurement_probabilities(theta)
+    print(f"{theta:.4f}      | {theta_deg:3d}°        | {p0:.2%} | {p1:.2%}")
+
+# Verify: latitude determines probability, not longitude
+print("\nAll equatorial states (θ = π/2) have same probabilities:")
+for phi_deg in [0, 45, 90, 135, 180]:
+    phi = np.radians(phi_deg)
+    p0, p1 = measurement_probabilities(np.pi/2)
+    print(f"φ = {phi_deg}°: P(|0⟩) = {p0:.2%}, P(|1⟩) = {p1:.2%}")</pre>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-buttons">
+            <a href="../03-common-states/index.html" class="btn btn-secondary">Previous</a>
+            <a href="../index.html" class="btn btn-primary">Home</a>
+            <a href="../05-density-matrix/index.html" class="btn btn-secondary">Next</a>
+        </nav>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls;
+        let stateVector, statePoint, equatorHighlight, poleHighlights;
+        let theta = Math.PI / 2;
+        
+        function init() {
+            const container = document.getElementById('canvas-container');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a2e);
+            
+            camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(2.5, 2, 2.5);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+            
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            
+            createBlochSphere();
+            createRegionHighlights();
+            addLighting();
+            
+            document.getElementById('region-select').addEventListener('change', updateRegions);
+            document.getElementById('theta-slider').addEventListener('input', updateTheta);
+            
+            window.addEventListener('resize', onWindowResize, false);
+            animate();
+        }
+        
+        function createBlochSphere() {
+            // Wireframe sphere
+            const sphereGeo = new THREE.SphereGeometry(1, 32, 32);
+            const sphereMat = new THREE.MeshBasicMaterial({
+                color: 0x00d4ff,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.15
+            });
+            scene.add(new THREE.Mesh(sphereGeo, sphereMat));
+            
+            // Axes
+            const axisLen = 1.4;
+            addAxis(-axisLen, 0, 0, axisLen, 0, 0, 0xff6b6b);
+            addAxis(0, -axisLen, 0, 0, axisLen, 0, 0x4ecdc4);
+            addAxis(0, 0, -axisLen, 0, 0, axisLen, 0x45b7d1);
+            
+            addLabel('|0⟩', 0, 0, 1.5);
+            addLabel('|1⟩', 0, 0, -1.5);
+            addLabel('|+⟩', 1.5, 0, 0);
+            addLabel('|-⟩', -1.5, 0, 0);
+            
+            // State vector
+            stateVector = new THREE.ArrowHelper(
+                new THREE.Vector3(1, 0, 0),
+                new THREE.Vector3(0, 0, 0),
+                1, 0xff6b9d, 0.15, 0.1
+            );
+            scene.add(stateVector);
+            
+            // State point
+            const pointGeo = new THREE.SphereGeometry(0.08, 16, 16);
+            const pointMat = new THREE.MeshPhongMaterial({ color: 0xff6b9d, emissive: 0xff6b9d, emissiveIntensity: 0.5 });
+            statePoint = new THREE.Mesh(pointGeo, pointMat);
+            statePoint.position.set(1, 0, 0);
+            scene.add(statePoint);
+        }
+        
+        function createRegionHighlights() {
+            // Equator highlight
+            const equatorGeo = new THREE.TorusGeometry(1, 0.05, 16, 64);
+            const equatorMat = new THREE.MeshPhongMaterial({ color: 0xffd700, transparent: true, opacity: 0.5 });
+            equatorHighlight = new THREE.Mesh(equatorGeo, equatorMat);
+            equatorHighlight.rotation.x = Math.PI / 2;
+            equatorHighlight.visible = false;
+            scene.add(equatorHighlight);
+            
+            // Pole highlights
+            poleHighlights = new THREE.Group();
+            
+            const northGeo = new THREE.SphereGeometry(0.15, 16, 16);
+            const northMat = new THREE.MeshPhongMaterial({ color: 0x45b7d1, emissive: 0x45b7d1, emissiveIntensity: 0.5 });
+            const north = new THREE.Mesh(northGeo, northMat);
+            north.position.set(0, 0, 1);
+            poleHighlights.add(north);
+            
+            const southGeo = new THREE.SphereGeometry(0.15, 16, 16);
+            const southMat = new THREE.MeshPhongMaterial({ color: 0x45b7d1, emissive: 0x45b7d1, emissiveIntensity: 0.5 });
+            const south = new THREE.Mesh(southGeo, southMat);
+            south.position.set(0, 0, -1);
+            poleHighlights.add(south);
+            
+            poleHighlights.visible = false;
+            scene.add(poleHighlights);
+        }
+        
+        function updateRegions() {
+            const region = document.getElementById('region-select').value;
+            
+            equatorHighlight.visible = (region === 'equator' || region === 'all');
+            poleHighlights.visible = (region === 'poles' || region === 'all');
+        }
+        
+        function updateTheta() {
+            theta = parseFloat(document.getElementById('theta-slider').value) / 100;
+            
+            const x = Math.sin(theta);
+            const z = Math.cos(theta);
+            
+            stateVector.setDirection(new THREE.Vector3(x, 0, z).normalize());
+            statePoint.position.set(x, 0, z);
+            
+            const p0 = Math.cos(theta / 2) ** 2;
+            const p1 = Math.sin(theta / 2) ** 2;
+            
+            document.getElementById('theta-value').textContent = formatAngle(theta);
+            document.getElementById('prob-display').textContent = 
+                `P(|0⟩) = ${(p0 * 100).toFixed(1)}% | P(|1⟩) = ${(p1 * 100).toFixed(1)}%`;
+        }
+        
+        function formatAngle(rad) {
+            const piMultiple = rad / Math.PI;
+            if (Math.abs(piMultiple) < 0.01) return '0';
+            if (Math.abs(piMultiple - 0.5) < 0.01) return 'π/2';
+            if (Math.abs(piMultiple - 1) < 0.01) return 'π';
+            return (piMultiple).toFixed(2) + 'π';
+        }
+        
+        function addAxis(x1, y1, z1, x2, y2, z2, color) {
+            const geo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(x1, y1, z1),
+                new THREE.Vector3(x2, y2, z2)
+            ]);
+            scene.add(new THREE.Line(geo, new THREE.LineBasicMaterial({ color })));
+        }
+        
+        function addLabel(text, x, y, z) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 32px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(text, 64, 45);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
+            sprite.position.set(x, y, z);
+            sprite.scale.set(0.4, 0.2, 1);
+            scene.add(sprite);
+        }
+        
+        function addLighting() {
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+            const point = new THREE.PointLight(0xffffff, 1);
+            point.position.set(5, 5, 5);
+            scene.add(point);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+        
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
