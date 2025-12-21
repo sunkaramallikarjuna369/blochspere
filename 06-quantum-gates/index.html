@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Gates - The Bloch Sphere</title>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Concept 6: Quantum Gates</h1>
+            <p class="subtitle">Rotations on the Bloch Sphere</p>
+        </header>
+
+        <nav class="nav-buttons">
+            <a href="../05-density-matrix/index.html" class="btn btn-secondary">Previous</a>
+            <a href="../index.html" class="btn btn-primary">Home</a>
+            <a href="../07-measurement/index.html" class="btn btn-secondary">Next</a>
+        </nav>
+
+        <div class="section full-width">
+            <h2>Interactive: Apply Quantum Gates</h2>
+            <div id="canvas-container"></div>
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label>Initial State:</label>
+                    <select id="state-select">
+                        <option value="0">|0⟩</option>
+                        <option value="1">|1⟩</option>
+                        <option value="+">|+⟩</option>
+                        <option value="-">|-⟩</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Apply Gate:</label>
+                    <select id="gate-select">
+                        <option value="none">None</option>
+                        <option value="X">X (Pauli-X)</option>
+                        <option value="Y">Y (Pauli-Y)</option>
+                        <option value="Z">Z (Pauli-Z)</option>
+                        <option value="H">H (Hadamard)</option>
+                        <option value="S">S (Phase)</option>
+                        <option value="T">T (π/8)</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="applyGate()">Apply Gate</button>
+                <button class="btn btn-secondary" onclick="resetState()">Reset</button>
+            </div>
+            <div class="info-box" style="margin-top: 15px;">
+                <p id="state-display">Current: |0⟩ → (0, 0, 1)</p>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="section">
+                <h2>Gates as Rotations</h2>
+                <p>Single-qubit unitary gates act as <strong>rotations</strong> on the Bloch Sphere:</p>
+                <div class="formula">R<sub>n̂</sub>(θ) = e<sup>-iθn̂·σ⃗/2</sup></div>
+                <p>This corresponds to a rotation by angle θ about axis n̂.</p>
+                <div class="key-point">
+                    <h4>Key Insight</h4>
+                    <p>Every single-qubit gate is a rotation! The Pauli gates are 180° rotations about their respective axes.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Pauli Gates</h2>
+                <table>
+                    <tr>
+                        <th>Gate</th>
+                        <th>Matrix</th>
+                        <th>Rotation</th>
+                    </tr>
+                    <tr>
+                        <td>X</td>
+                        <td>[0 1; 1 0]</td>
+                        <td>180° about X-axis</td>
+                    </tr>
+                    <tr>
+                        <td>Y</td>
+                        <td>[0 -i; i 0]</td>
+                        <td>180° about Y-axis</td>
+                    </tr>
+                    <tr>
+                        <td>Z</td>
+                        <td>[1 0; 0 -1]</td>
+                        <td>180° about Z-axis</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>Hadamard Gate</h2>
+                <div class="formula">H = (X + Z)/√2 = [1 1; 1 -1]/√2</div>
+                <p>The Hadamard gate rotates 180° about the axis (X + Z)/√2, which is the diagonal between X and Z axes.</p>
+                <p><strong>Effect:</strong></p>
+                <ul style="margin-left: 20px;">
+                    <li>H|0⟩ = |+⟩ (North pole → +X)</li>
+                    <li>H|1⟩ = |-⟩ (South pole → -X)</li>
+                    <li>H|+⟩ = |0⟩ (+X → North pole)</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Phase Gates</h2>
+                <table>
+                    <tr>
+                        <th>Gate</th>
+                        <th>Matrix</th>
+                        <th>Rotation</th>
+                    </tr>
+                    <tr>
+                        <td>S</td>
+                        <td>[1 0; 0 i]</td>
+                        <td>90° about Z-axis</td>
+                    </tr>
+                    <tr>
+                        <td>T</td>
+                        <td>[1 0; 0 e<sup>iπ/4</sup>]</td>
+                        <td>45° about Z-axis</td>
+                    </tr>
+                </table>
+                <p>Phase gates only affect the relative phase (longitude), not the amplitude (latitude).</p>
+            </div>
+
+            <div class="section full-width">
+                <h2>Gate Action Summary</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Initial</th>
+                            <th>X</th>
+                            <th>Y</th>
+                            <th>Z</th>
+                            <th>H</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>|0⟩</td>
+                            <td>|1⟩</td>
+                            <td>i|1⟩</td>
+                            <td>|0⟩</td>
+                            <td>|+⟩</td>
+                        </tr>
+                        <tr>
+                            <td>|1⟩</td>
+                            <td>|0⟩</td>
+                            <td>-i|0⟩</td>
+                            <td>-|1⟩</td>
+                            <td>|-⟩</td>
+                        </tr>
+                        <tr>
+                            <td>|+⟩</td>
+                            <td>|+⟩</td>
+                            <td>-i|-⟩</td>
+                            <td>|-⟩</td>
+                            <td>|0⟩</td>
+                        </tr>
+                        <tr>
+                            <td>|-⟩</td>
+                            <td>|-⟩</td>
+                            <td>i|+⟩</td>
+                            <td>|+⟩</td>
+                            <td>|1⟩</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section full-width">
+                <h2>Python Example</h2>
+                <div class="code-block">
+<pre>import numpy as np
+
+# Define gates
+I = np.eye(2)
+X = np.array([[0, 1], [1, 0]])
+Y = np.array([[0, -1j], [1j, 0]])
+Z = np.array([[1, 0], [0, -1]])
+H = np.array([[1, 1], [1, -1]]) / np.sqrt(2)
+S = np.array([[1, 0], [0, 1j]])
+T = np.array([[1, 0], [0, np.exp(1j * np.pi / 4)]])
+
+# Define states
+ket_0 = np.array([1, 0])
+ket_1 = np.array([0, 1])
+
+def state_to_bloch(state):
+    """Convert state to Bloch coordinates."""
+    rho = np.outer(state, np.conj(state))
+    x = 2 * np.real(rho[0, 1])
+    y = 2 * np.imag(rho[0, 1])
+    z = np.real(rho[0, 0] - rho[1, 1])
+    return (x, y, z)
+
+# Demonstrate gate actions
+print("Gate actions on |0⟩:")
+print(f"Initial |0⟩: {state_to_bloch(ket_0)}")
+print(f"X|0⟩ = |1⟩: {state_to_bloch(X @ ket_0)}")
+print(f"H|0⟩ = |+⟩: {state_to_bloch(H @ ket_0)}")
+print(f"S|+⟩:       {state_to_bloch(S @ H @ ket_0)}")
+
+# Verify rotations
+print("\nVerify: X is 180° rotation about X-axis")
+print(f"|0⟩ → X → |1⟩: (0,0,1) → (0,0,-1)")
+print(f"Actual: {state_to_bloch(ket_0)} → {state_to_bloch(X @ ket_0)}")</pre>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-buttons">
+            <a href="../05-density-matrix/index.html" class="btn btn-secondary">Previous</a>
+            <a href="../index.html" class="btn btn-primary">Home</a>
+            <a href="../07-measurement/index.html" class="btn btn-secondary">Next</a>
+        </nav>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls;
+        let stateVector, statePoint, rotationAxis;
+        let currentState = { x: 0, y: 0, z: 1 };
+        let animating = false;
+        
+        const states = {
+            '0': { x: 0, y: 0, z: 1 },
+            '1': { x: 0, y: 0, z: -1 },
+            '+': { x: 1, y: 0, z: 0 },
+            '-': { x: -1, y: 0, z: 0 }
+        };
+        
+        function init() {
+            const container = document.getElementById('canvas-container');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a2e);
+            
+            camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(2.5, 2, 2.5);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+            
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            
+            createVisualization();
+            addLighting();
+            
+            document.getElementById('state-select').addEventListener('change', resetState);
+            
+            window.addEventListener('resize', onWindowResize, false);
+            animate();
+        }
+        
+        function createVisualization() {
+            // Wireframe sphere
+            const sphereGeo = new THREE.SphereGeometry(1, 32, 32);
+            const sphereMat = new THREE.MeshBasicMaterial({
+                color: 0x00d4ff,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.15
+            });
+            scene.add(new THREE.Mesh(sphereGeo, sphereMat));
+            
+            // Axes
+            const axisLen = 1.4;
+            addAxis(-axisLen, 0, 0, axisLen, 0, 0, 0xff6b6b);
+            addAxis(0, -axisLen, 0, 0, axisLen, 0, 0x4ecdc4);
+            addAxis(0, 0, -axisLen, 0, 0, axisLen, 0x45b7d1);
+            
+            addLabel('X', 1.5, 0, 0);
+            addLabel('Y', 0, 1.5, 0);
+            addLabel('|0⟩', 0, 0, 1.5);
+            addLabel('|1⟩', 0, 0, -1.5);
+            
+            // State vector
+            stateVector = new THREE.ArrowHelper(
+                new THREE.Vector3(0, 0, 1),
+                new THREE.Vector3(0, 0, 0),
+                1, 0xff6b9d, 0.15, 0.1
+            );
+            scene.add(stateVector);
+            
+            // State point
+            const pointGeo = new THREE.SphereGeometry(0.1, 16, 16);
+            const pointMat = new THREE.MeshPhongMaterial({ color: 0xff6b9d, emissive: 0xff6b9d, emissiveIntensity: 0.5 });
+            statePoint = new THREE.Mesh(pointGeo, pointMat);
+            statePoint.position.set(0, 0, 1);
+            scene.add(statePoint);
+            
+            // Rotation axis indicator (hidden initially)
+            rotationAxis = new THREE.ArrowHelper(
+                new THREE.Vector3(1, 0, 0),
+                new THREE.Vector3(0, 0, 0),
+                1.3, 0xffd700, 0.1, 0.08
+            );
+            rotationAxis.visible = false;
+            scene.add(rotationAxis);
+        }
+        
+        function addAxis(x1, y1, z1, x2, y2, z2, color) {
+            const geo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(x1, y1, z1),
+                new THREE.Vector3(x2, y2, z2)
+            ]);
+            scene.add(new THREE.Line(geo, new THREE.LineBasicMaterial({ color })));
+        }
+        
+        function addLabel(text, x, y, z) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 32px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(text, 64, 45);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
+            sprite.position.set(x, y, z);
+            sprite.scale.set(0.4, 0.2, 1);
+            scene.add(sprite);
+        }
+        
+        window.resetState = function() {
+            const stateKey = document.getElementById('state-select').value;
+            currentState = { ...states[stateKey] };
+            updateVisualization();
+            document.getElementById('gate-select').value = 'none';
+        };
+        
+        window.applyGate = function() {
+            if (animating) return;
+            
+            const gate = document.getElementById('gate-select').value;
+            if (gate === 'none') return;
+            
+            let axis, angle;
+            
+            switch (gate) {
+                case 'X':
+                    axis = new THREE.Vector3(1, 0, 0);
+                    angle = Math.PI;
+                    break;
+                case 'Y':
+                    axis = new THREE.Vector3(0, 1, 0);
+                    angle = Math.PI;
+                    break;
+                case 'Z':
+                    axis = new THREE.Vector3(0, 0, 1);
+                    angle = Math.PI;
+                    break;
+                case 'H':
+                    axis = new THREE.Vector3(1, 0, 1).normalize();
+                    angle = Math.PI;
+                    break;
+                case 'S':
+                    axis = new THREE.Vector3(0, 0, 1);
+                    angle = Math.PI / 2;
+                    break;
+                case 'T':
+                    axis = new THREE.Vector3(0, 0, 1);
+                    angle = Math.PI / 4;
+                    break;
+            }
+            
+            // Show rotation axis
+            rotationAxis.setDirection(axis);
+            rotationAxis.visible = true;
+            
+            // Animate rotation
+            animateRotation(axis, angle);
+        };
+        
+        function animateRotation(axis, totalAngle) {
+            animating = true;
+            const steps = 60;
+            const angleStep = totalAngle / steps;
+            let step = 0;
+            
+            const startPos = new THREE.Vector3(currentState.x, currentState.y, currentState.z);
+            
+            function rotateStep() {
+                if (step < steps) {
+                    const pos = new THREE.Vector3(currentState.x, currentState.y, currentState.z);
+                    pos.applyAxisAngle(axis, angleStep);
+                    currentState.x = pos.x;
+                    currentState.y = pos.y;
+                    currentState.z = pos.z;
+                    updateVisualization();
+                    step++;
+                    requestAnimationFrame(rotateStep);
+                } else {
+                    animating = false;
+                    rotationAxis.visible = false;
+                }
+            }
+            
+            rotateStep();
+        }
+        
+        function updateVisualization() {
+            const dir = new THREE.Vector3(currentState.x, currentState.y, currentState.z).normalize();
+            stateVector.setDirection(dir);
+            statePoint.position.set(currentState.x, currentState.y, currentState.z);
+            
+            // Update display
+            let stateName = 'Custom';
+            for (const [key, val] of Object.entries(states)) {
+                if (Math.abs(val.x - currentState.x) < 0.1 && 
+                    Math.abs(val.y - currentState.y) < 0.1 && 
+                    Math.abs(val.z - currentState.z) < 0.1) {
+                    stateName = '|' + key + '⟩';
+                    break;
+                }
+            }
+            
+            document.getElementById('state-display').textContent = 
+                `Current: ${stateName} → (${currentState.x.toFixed(2)}, ${currentState.y.toFixed(2)}, ${currentState.z.toFixed(2)})`;
+        }
+        
+        function addLighting() {
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+            const point = new THREE.PointLight(0xffffff, 1);
+            point.position.set(5, 5, 5);
+            scene.add(point);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+        
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

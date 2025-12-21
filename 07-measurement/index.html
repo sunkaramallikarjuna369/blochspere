@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Measurement - The Bloch Sphere</title>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Concept 7: Measurement</h1>
+            <p class="subtitle">Projection and State Collapse</p>
+        </header>
+
+        <nav class="nav-buttons">
+            <a href="../06-quantum-gates/index.html" class="btn btn-secondary">Previous</a>
+            <a href="../index.html" class="btn btn-primary">Home</a>
+            <a href="../08-mixed-states/index.html" class="btn btn-secondary">Next</a>
+        </nav>
+
+        <div class="section full-width">
+            <h2>Interactive: Quantum Measurement</h2>
+            <div id="canvas-container"></div>
+            <div class="controls-panel">
+                <div class="control-group">
+                    <label>θ: <span id="theta-value">π/3</span></label>
+                    <input type="range" id="theta-slider" min="0" max="314" value="105">
+                </div>
+                <div class="control-group">
+                    <label>Measurement Basis:</label>
+                    <select id="basis-select">
+                        <option value="Z">Z basis (|0⟩, |1⟩)</option>
+                        <option value="X">X basis (|+⟩, |-⟩)</option>
+                        <option value="Y">Y basis (|+i⟩, |-i⟩)</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="measure()">MEASURE</button>
+                <button class="btn btn-secondary" onclick="resetState()">Reset</button>
+            </div>
+            <div class="info-box" style="margin-top: 15px;">
+                <p id="prob-display">P(|0⟩) = 75.0% | P(|1⟩) = 25.0%</p>
+                <p id="result-display" style="font-size: 1.2em; color: #ffd700;"></p>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="section">
+                <h2>Measurement as Projection</h2>
+                <p>Quantum measurement corresponds to <strong>projecting</strong> the qubit state onto one of the measurement basis axes.</p>
+                <div class="formula">
+                    P(0) = cos²(θ/2)<br>
+                    P(1) = sin²(θ/2)
+                </div>
+                <p>After measurement, the Bloch vector <strong>jumps</strong> to the north or south pole (for Z-basis measurement).</p>
+            </div>
+
+            <div class="section">
+                <h2>State Collapse</h2>
+                <p>Before measurement: superposition state anywhere on sphere</p>
+                <p>After measurement: collapsed to one of the basis states</p>
+                <div class="key-point">
+                    <h4>Irreversible Process</h4>
+                    <p>Measurement destroys the superposition. The original state cannot be recovered!</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Z-Basis Measurement</h2>
+                <p>The standard computational basis measurement:</p>
+                <ul style="margin-left: 20px;">
+                    <li>Projects onto the Z-axis</li>
+                    <li>Outcomes: |0⟩ (north pole) or |1⟩ (south pole)</li>
+                    <li>Probability depends on "latitude" (θ)</li>
+                </ul>
+                <div class="formula">
+                    |0⟩: z = +1 (north pole)<br>
+                    |1⟩: z = -1 (south pole)
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>X-Basis Measurement</h2>
+                <p>Measuring in the Hadamard basis:</p>
+                <ul style="margin-left: 20px;">
+                    <li>Projects onto the X-axis</li>
+                    <li>Outcomes: |+⟩ (+X) or |-⟩ (-X)</li>
+                    <li>Probability depends on x-coordinate</li>
+                </ul>
+                <div class="formula">
+                    P(+) = (1 + x)/2<br>
+                    P(-) = (1 - x)/2
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Y-Basis Measurement</h2>
+                <p>Measuring in the circular polarization basis:</p>
+                <ul style="margin-left: 20px;">
+                    <li>Projects onto the Y-axis</li>
+                    <li>Outcomes: |+i⟩ (+Y) or |-i⟩ (-Y)</li>
+                    <li>Probability depends on y-coordinate</li>
+                </ul>
+                <div class="formula">
+                    P(+i) = (1 + y)/2<br>
+                    P(-i) = (1 - y)/2
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Geometric Interpretation</h2>
+                <p>For any measurement basis:</p>
+                <ol style="margin-left: 20px;">
+                    <li>Draw a line from the state point perpendicular to the measurement axis</li>
+                    <li>The projection point determines the probabilities</li>
+                    <li>After measurement, state jumps to one of the axis endpoints</li>
+                </ol>
+            </div>
+
+            <div class="section full-width">
+                <h2>Python Example</h2>
+                <div class="code-block">
+<pre>import numpy as np
+
+def measure_z_basis(state, num_shots=1000):
+    """Simulate Z-basis measurement."""
+    p0 = np.abs(state[0])**2
+    p1 = np.abs(state[1])**2
+    
+    outcomes = np.random.choice([0, 1], size=num_shots, p=[p0, p1])
+    return outcomes
+
+def measure_x_basis(state, num_shots=1000):
+    """Simulate X-basis measurement."""
+    # Transform to X basis
+    H = np.array([[1, 1], [1, -1]]) / np.sqrt(2)
+    state_x = H @ state
+    
+    p_plus = np.abs(state_x[0])**2
+    p_minus = np.abs(state_x[1])**2
+    
+    outcomes = np.random.choice(['+', '-'], size=num_shots, p=[p_plus, p_minus])
+    return outcomes
+
+# Create a state at θ = π/3
+theta = np.pi / 3
+state = np.array([np.cos(theta/2), np.sin(theta/2)])
+
+print(f"State: cos({theta/np.pi:.2f}π/2)|0⟩ + sin({theta/np.pi:.2f}π/2)|1⟩")
+print(f"P(|0⟩) = {np.abs(state[0])**2:.4f}")
+print(f"P(|1⟩) = {np.abs(state[1])**2:.4f}")
+
+# Simulate measurements
+z_outcomes = measure_z_basis(state, 10000)
+print(f"\nZ-basis measurement (10000 shots):")
+print(f"  |0⟩: {np.sum(z_outcomes == 0)} ({np.mean(z_outcomes == 0)*100:.1f}%)")
+print(f"  |1⟩: {np.sum(z_outcomes == 1)} ({np.mean(z_outcomes == 1)*100:.1f}%)")</pre>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-buttons">
+            <a href="../06-quantum-gates/index.html" class="btn btn-secondary">Previous</a>
+            <a href="../index.html" class="btn btn-primary">Home</a>
+            <a href="../08-mixed-states/index.html" class="btn btn-secondary">Next</a>
+        </nav>
+    </div>
+
+    <script>
+        let scene, camera, renderer, controls;
+        let stateVector, statePoint, projectionLine;
+        let theta = Math.PI / 3, phi = 0;
+        let measured = false;
+        
+        function init() {
+            const container = document.getElementById('canvas-container');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a2e);
+            
+            camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(2.5, 2, 2.5);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+            
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            
+            createVisualization();
+            addLighting();
+            
+            document.getElementById('theta-slider').addEventListener('input', updateState);
+            document.getElementById('basis-select').addEventListener('change', updateProbabilities);
+            
+            window.addEventListener('resize', onWindowResize, false);
+            updateState();
+            animate();
+        }
+        
+        function createVisualization() {
+            // Wireframe sphere
+            const sphereGeo = new THREE.SphereGeometry(1, 32, 32);
+            const sphereMat = new THREE.MeshBasicMaterial({
+                color: 0x00d4ff,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.15
+            });
+            scene.add(new THREE.Mesh(sphereGeo, sphereMat));
+            
+            // Axes
+            const axisLen = 1.4;
+            addAxis(-axisLen, 0, 0, axisLen, 0, 0, 0xff6b6b);
+            addAxis(0, -axisLen, 0, 0, axisLen, 0, 0x4ecdc4);
+            addAxis(0, 0, -axisLen, 0, 0, axisLen, 0x45b7d1);
+            
+            addLabel('|+⟩', 1.5, 0, 0);
+            addLabel('|-⟩', -1.5, 0, 0);
+            addLabel('|0⟩', 0, 0, 1.5);
+            addLabel('|1⟩', 0, 0, -1.5);
+            
+            // State vector
+            stateVector = new THREE.ArrowHelper(
+                new THREE.Vector3(0, 0, 1),
+                new THREE.Vector3(0, 0, 0),
+                1, 0xff6b9d, 0.15, 0.1
+            );
+            scene.add(stateVector);
+            
+            // State point
+            const pointGeo = new THREE.SphereGeometry(0.1, 16, 16);
+            const pointMat = new THREE.MeshPhongMaterial({ color: 0xff6b9d, emissive: 0xff6b9d, emissiveIntensity: 0.5 });
+            statePoint = new THREE.Mesh(pointGeo, pointMat);
+            scene.add(statePoint);
+            
+            // Projection line
+            const projGeo = new THREE.BufferGeometry();
+            const projMat = new THREE.LineDashedMaterial({ color: 0xffd700, dashSize: 0.1, gapSize: 0.05 });
+            projectionLine = new THREE.Line(projGeo, projMat);
+            scene.add(projectionLine);
+        }
+        
+        function updateState() {
+            if (measured) return;
+            
+            theta = parseFloat(document.getElementById('theta-slider').value) / 100;
+            
+            const x = Math.sin(theta) * Math.cos(phi);
+            const y = Math.sin(theta) * Math.sin(phi);
+            const z = Math.cos(theta);
+            
+            stateVector.setDirection(new THREE.Vector3(x, y, z).normalize());
+            statePoint.position.set(x, y, z);
+            
+            document.getElementById('theta-value').textContent = formatAngle(theta);
+            updateProbabilities();
+            updateProjectionLine();
+        }
+        
+        function updateProbabilities() {
+            const basis = document.getElementById('basis-select').value;
+            const x = Math.sin(theta) * Math.cos(phi);
+            const y = Math.sin(theta) * Math.sin(phi);
+            const z = Math.cos(theta);
+            
+            let p1, p2, label1, label2;
+            
+            if (basis === 'Z') {
+                p1 = (1 + z) / 2;
+                p2 = (1 - z) / 2;
+                label1 = '|0⟩';
+                label2 = '|1⟩';
+            } else if (basis === 'X') {
+                p1 = (1 + x) / 2;
+                p2 = (1 - x) / 2;
+                label1 = '|+⟩';
+                label2 = '|-⟩';
+            } else {
+                p1 = (1 + y) / 2;
+                p2 = (1 - y) / 2;
+                label1 = '|+i⟩';
+                label2 = '|-i⟩';
+            }
+            
+            document.getElementById('prob-display').textContent = 
+                `P(${label1}) = ${(p1 * 100).toFixed(1)}% | P(${label2}) = ${(p2 * 100).toFixed(1)}%`;
+        }
+        
+        function updateProjectionLine() {
+            const basis = document.getElementById('basis-select').value;
+            const x = Math.sin(theta) * Math.cos(phi);
+            const y = Math.sin(theta) * Math.sin(phi);
+            const z = Math.cos(theta);
+            
+            let projPoint;
+            if (basis === 'Z') {
+                projPoint = new THREE.Vector3(0, 0, z);
+            } else if (basis === 'X') {
+                projPoint = new THREE.Vector3(x, 0, 0);
+            } else {
+                projPoint = new THREE.Vector3(0, y, 0);
+            }
+            
+            const points = [
+                new THREE.Vector3(x, y, z),
+                projPoint
+            ];
+            projectionLine.geometry.setFromPoints(points);
+            projectionLine.computeLineDistances();
+        }
+        
+        window.measure = function() {
+            const basis = document.getElementById('basis-select').value;
+            const x = Math.sin(theta) * Math.cos(phi);
+            const y = Math.sin(theta) * Math.sin(phi);
+            const z = Math.cos(theta);
+            
+            let p1, outcome, newPos;
+            
+            if (basis === 'Z') {
+                p1 = (1 + z) / 2;
+                outcome = Math.random() < p1 ? '|0⟩' : '|1⟩';
+                newPos = outcome === '|0⟩' ? { x: 0, y: 0, z: 1 } : { x: 0, y: 0, z: -1 };
+            } else if (basis === 'X') {
+                p1 = (1 + x) / 2;
+                outcome = Math.random() < p1 ? '|+⟩' : '|-⟩';
+                newPos = outcome === '|+⟩' ? { x: 1, y: 0, z: 0 } : { x: -1, y: 0, z: 0 };
+            } else {
+                p1 = (1 + y) / 2;
+                outcome = Math.random() < p1 ? '|+i⟩' : '|-i⟩';
+                newPos = outcome === '|+i⟩' ? { x: 0, y: 1, z: 0 } : { x: 0, y: -1, z: 0 };
+            }
+            
+            // Animate collapse
+            animateCollapse(newPos, outcome);
+        };
+        
+        function animateCollapse(targetPos, outcome) {
+            measured = true;
+            const startPos = { ...statePoint.position };
+            const steps = 30;
+            let step = 0;
+            
+            function collapseStep() {
+                if (step < steps) {
+                    const t = step / steps;
+                    const x = startPos.x + (targetPos.x - startPos.x) * t;
+                    const y = startPos.y + (targetPos.y - startPos.y) * t;
+                    const z = startPos.z + (targetPos.z - startPos.z) * t;
+                    
+                    stateVector.setDirection(new THREE.Vector3(x, y, z).normalize());
+                    statePoint.position.set(x, y, z);
+                    
+                    step++;
+                    requestAnimationFrame(collapseStep);
+                } else {
+                    document.getElementById('result-display').textContent = `Measured: ${outcome}`;
+                }
+            }
+            
+            collapseStep();
+        }
+        
+        window.resetState = function() {
+            measured = false;
+            document.getElementById('result-display').textContent = '';
+            updateState();
+        };
+        
+        function formatAngle(rad) {
+            const piMultiple = rad / Math.PI;
+            if (Math.abs(piMultiple) < 0.01) return '0';
+            if (Math.abs(piMultiple - 0.33) < 0.02) return 'π/3';
+            if (Math.abs(piMultiple - 0.5) < 0.01) return 'π/2';
+            if (Math.abs(piMultiple - 1) < 0.01) return 'π';
+            return (piMultiple).toFixed(2) + 'π';
+        }
+        
+        function addAxis(x1, y1, z1, x2, y2, z2, color) {
+            const geo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(x1, y1, z1),
+                new THREE.Vector3(x2, y2, z2)
+            ]);
+            scene.add(new THREE.Line(geo, new THREE.LineBasicMaterial({ color })));
+        }
+        
+        function addLabel(text, x, y, z) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 32px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(text, 64, 45);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, transparent: true }));
+            sprite.position.set(x, y, z);
+            sprite.scale.set(0.4, 0.2, 1);
+            scene.add(sprite);
+        }
+        
+        function addLighting() {
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+            const point = new THREE.PointLight(0xffffff, 1);
+            point.position.set(5, 5, 5);
+            scene.add(point);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        function onWindowResize() {
+            const container = document.getElementById('canvas-container');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+        
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
